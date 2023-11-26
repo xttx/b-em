@@ -33,7 +33,7 @@ typedef enum {
     ST_DONE
 } state_t;
 
-#define BBC_NKEY 82
+#define BBC_NKEY 85
 
 static const key_cap_t kcaps_bbc[BBC_NKEY] = {
     {  82,  10,  28,  28, COL_RED,   "F0",          "F0",          0x20 },
@@ -119,12 +119,16 @@ static const key_cap_t kcaps_bbc[BBC_NKEY] = {
     {  70, 248,  96,  28, COL_GREEN, "Quick Save",  "Quick Save",  0xfa },
     { 170, 248,  96,  28, COL_GREEN, "Quick Load",  "Quick Load",  0xf9 },
     { 270, 248,  96,  28, COL_GREEN, "Prev Slot",   "Prev Slot",   0xf8 },
-    { 370, 248,  96,  28, COL_GREEN, "Next Slot",   "Next Slot",   0xf7 }
+    { 370, 248,  96,  28, COL_GREEN, "Next Slot",   "Next Slot",   0xf7 },
+
+    {  70, 278,  96,  28, COL_GREEN, "Load Disc 0",  "Load Disc 0", 0xf6 },
+    { 170, 278,  96,  28, COL_GREEN, "Load Disc 1",  "Load Disc 1", 0xf5 },
+    { 270, 278,  96,  28, COL_GREEN, "Load Tape",    "Load Tape",   0xf4 }
 };
 
-static const key_dlg_t bbc_kbd_dlg = { kcaps_bbc, kcaps_bbc + BBC_NKEY, 538, 334 };
+static const key_dlg_t bbc_kbd_dlg = { kcaps_bbc, kcaps_bbc + BBC_NKEY, 538, 364 };
 
-#define MASTER_NKEY 101
+#define MASTER_NKEY 104
 
 static const key_cap_t kcaps_master[MASTER_NKEY] = {
     {  50,  10,  28,  28, COL_RED,   "F0",          "F0",          0x20 },
@@ -230,12 +234,16 @@ static const key_cap_t kcaps_master[MASTER_NKEY] = {
     { 116, 248,  96,  28, COL_GREEN, "Quick Save",  "Quick Save",  0xfa },
     { 216, 248,  96,  28, COL_GREEN, "Quick Load",  "Quick Load",  0xf9 },
     { 316, 248,  96,  28, COL_GREEN, "Prev Slot",   "Prev Slot",   0xf8 },
-    { 416, 248,  96,  28, COL_GREEN, "Next Slot",   "Next Slot",   0xf7 }
+    { 416, 248,  96,  28, COL_GREEN, "Next Slot",   "Next Slot",   0xf7 },
+
+    {  70, 278,  96,  28, COL_GREEN, "Load Disc 0",  "Load Disc 0", 0xf6 },
+    { 170, 278,  96,  28, COL_GREEN, "Load Disc 1",  "Load Disc 1", 0xf5 },
+    { 270, 278,  96,  28, COL_GREEN, "Load Tape",    "Load Tape",   0xf4 }
 };
 
-static const key_dlg_t master_kbd_dlg = { kcaps_master, kcaps_master + MASTER_NKEY, 676, 334 };
+static const key_dlg_t master_kbd_dlg = { kcaps_master, kcaps_master + MASTER_NKEY, 676, 364 };
 
-#define BTNS_Y    296
+#define BTNS_Y    326
 #define BTNS_W     60
 #define BTNS_H     28
 #define BTN_OK_X  201
