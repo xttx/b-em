@@ -1,6 +1,7 @@
 /*B-em v2.2 by Tom Walker
   Allegro video code*/
 #include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_font.h>
 #include "b-em.h"
 #include "led.h"
 #include "main.h"
@@ -26,6 +27,10 @@ int winsizex, winsizey, vid_win_multiplier;
 int save_winx, save_winy;
 int save_winsizex, save_winsizey;
 int scr_x_start, scr_x_size, scr_y_start, scr_y_size;
+
+int fast_forward_triangles_x = 20;
+int fast_forward_triangles_y = 40;
+int fast_forward_triangles_size = 20;
 
 bool vid_print_mode = false;
 
@@ -478,6 +483,31 @@ static void render_leds(void)
     }
 }
 
+static void render_hud(void)
+{
+    if (quick_save_hud_alpha > 0) {
+        al_set_blender(ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA);
+
+        quick_save_hud_alpha -= 5;
+        if (quick_save_hud_alpha < 0) quick_save_hud_alpha = 0;
+
+        ALLEGRO_FONT* font = al_create_builtin_font();
+        ALLEGRO_COLOR clr = al_map_rgba(255, 255, 255, quick_save_hud_alpha);
+        al_draw_text(font, clr, 20, 20, 0, quick_save_hud);
+    }
+
+    if (fastforward) {
+        int x = fast_forward_triangles_x;
+        int y = fast_forward_triangles_y;
+        int s = fast_forward_triangles_size;
+        al_draw_filled_triangle(x, y, x, y + s, x + s, y + (s / 2), al_map_rgb(30, 100, 255));
+        al_draw_triangle(x, y, x, y + s, x + s, y + (s / 2), al_map_rgb(30, 255, 100), 3);
+        x += s + 10;
+        al_draw_filled_triangle(x, y, x, y + s, x + s, y + (s / 2), al_map_rgb(30, 100, 255));
+        al_draw_triangle(x, y, x, y + s, x + s, y + (s / 2), al_map_rgb(30, 255, 100), 3);
+    }
+}
+
 void video_doblit(bool non_ttx, uint8_t vtotal)
 {
     if (vid_savescrshot)
@@ -494,6 +524,7 @@ void video_doblit(bool non_ttx, uint8_t vtotal)
             fill_letterbox();
 
         render_leds();
+        render_hud();
         al_flip_display();
     }
     firstx = firsty = 65535;

@@ -367,7 +367,7 @@ void main_restart()
 
 int resetting = 0;
 int framesrun = 0;
-
+bool fastforward = false;
 void main_cleardrawit()
 {
     fcount = 0;
@@ -375,6 +375,7 @@ void main_cleardrawit()
 
 void main_start_fullspeed(void)
 {
+    fastforward = true;
     if (fullspeed != FSPEED_RUNNING) {
         ALLEGRO_EVENT event;
 
@@ -388,6 +389,7 @@ void main_start_fullspeed(void)
 
 void main_stop_fullspeed(bool hostshift)
 {
+    fastforward = false;
     if (emuspeed != EMU_SPEED_FULL) {
         if (!hostshift) {
             log_debug("main: stopping fullspeed (PgUp)");
@@ -437,6 +439,8 @@ void main_key_pause(void)
 }
 
 int save_slot = 0;
+const char* quick_save_hud;
+int quick_save_hud_alpha = -1;
 void main_quick_save(void)
 {
     char* prefix = "QuickSave";
@@ -461,6 +465,17 @@ void main_quick_save(void)
     al_set_path_filename(path, filename);
     cpath = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
     savestate_save(cpath);
+    
+    //hud
+    if (quick_save_hud != NULL) free(quick_save_hud);
+    prefix = "Saved State: ";
+    quick_save_hud = malloc(strlen(prefix) + strlen(filename) + 5);
+    strcpy(quick_save_hud, prefix);
+    strcat(quick_save_hud, filename);
+    strcat(quick_save_hud, ".snp");
+    quick_save_hud_alpha = 255;
+
+    //free(filename);
 }
 void main_quick_load(void)
 {
@@ -481,6 +496,8 @@ void main_quick_load(void)
     strcat(filename, suffix);
     strcat(filename, ext);
 
+    if (quick_save_hud != NULL) free(quick_save_hud);
+
     ALLEGRO_PATH* path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
     al_append_path_component(path, "states");
     al_set_path_filename(path, filename);
@@ -488,17 +505,47 @@ void main_quick_load(void)
     DWORD dwAttrib = GetFileAttributes(cpath);
     if (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY)) {
         savestate_load(cpath);
+
+        //hud
+        prefix = "Loaded State: ";
     }
+    else {
+        prefix = "State not found: ";
+    }
+    quick_save_hud = malloc(strlen(prefix) + strlen(filename) + 1);
+    strcpy(quick_save_hud, prefix);
+    strcat(quick_save_hud, filename);
+    quick_save_hud_alpha = 255;
+
+    //free(filename);
 }
 void main_quick_slot_prev(void)
 {
     save_slot--;
     if (save_slot < 0) save_slot = 0;
+
+    if (quick_save_hud != NULL) free(quick_save_hud);
+    char* prefix = "Set QuickSave slot: ";
+    char suffix[2];
+    suffix[0] = save_slot + '0'; suffix[1] = '\0';
+    quick_save_hud = malloc(strlen(prefix) + 2);
+    strcpy(quick_save_hud, prefix);
+    strcat(quick_save_hud, suffix);
+    quick_save_hud_alpha = 255;
 }
 void main_quick_slot_next(void)
 {
     save_slot++;
-    if (save_slot > 35) save_slot = 35;
+    if (save_slot > 9) save_slot = 9;
+
+    if (quick_save_hud != NULL) free(quick_save_hud);
+    char* prefix = "Set QuickSave slot: ";
+    char suffix[2];
+    suffix[0] = save_slot + '0'; suffix[1] = '\0';
+    quick_save_hud = malloc(strlen(prefix) + 2);
+    strcpy(quick_save_hud, prefix);
+    strcat(quick_save_hud, suffix);
+    quick_save_hud_alpha = 255;
 }
 
 double prev_time = 0;

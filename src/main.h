@@ -14,6 +14,9 @@ typedef struct {
 extern const emu_speed_t emu_speeds[NUM_EMU_SPEEDS];
 extern int emuspeed;
 extern int framesrun;
+extern bool fastforward;
+extern const char* quick_save_hud;
+extern int quick_save_hud_alpha;
 
 extern bool quitting;
 extern bool keydefining;
