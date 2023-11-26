@@ -23,6 +23,7 @@ int vid_savescrshot = 0;
 char vid_scrshotname[260];
 
 int winsizex, winsizey, vid_win_multiplier;
+int save_winx, save_winy;
 int save_winsizex, save_winsizey;
 int scr_x_start, scr_x_size, scr_y_start, scr_y_size;
 
@@ -51,42 +52,57 @@ void video_enterfullscreen()
     display = al_get_current_display();
     save_winsizex = al_get_display_width(display);
     save_winsizey = al_get_display_height(display);
-    if (al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, true)) {
+    al_get_window_position(display, &save_winx, &save_winy);
 
-        //no we really do mean it
-        al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, false);
-        al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, true);
 
-        black = al_map_rgb(0, 0, 0);
-        winsizex = al_get_display_width(display);
-        winsizey = al_get_display_height(display);
-        aspect = (double)winsizex / (double)winsizey;
-        if (aspect > (4.0 / 3.0)) {
-            value = 4 * winsizey / 3;
-            scr_x_start = (winsizex - value) / 2;
-            scr_y_start = 0;
-            scr_x_size = value;
-            scr_y_size = winsizey;
-            al_set_target_backbuffer(display);
-            // fill the gap between the left screen edge and the BBC image.
-            al_draw_filled_rectangle(0, 0, scr_x_start, scr_y_size, black);
-            // fill the gap between the BBC image and the right screen edge.
-            al_draw_filled_rectangle(scr_x_start + value, 0, winsizex, winsizey, black);
+    int cur_adapter = -1;
+    int display_num = al_get_num_video_adapters();
+    ALLEGRO_MONITOR_INFO aminfo;
+    for (int n = 0; n < display_num; n++) {
+        al_get_monitor_info(n, &aminfo);
+        if (save_winx >= aminfo.x1 && save_winx <= aminfo.x2 && save_winy >= aminfo.y1 && save_winy <= aminfo.y2) {
+            cur_adapter = n; break;
         }
-        else {
-            value = 3 * winsizex / 4;
-            scr_x_start = 0;
-            scr_y_start = (winsizey - value) / 2;
-            scr_x_size = winsizex;
-            scr_y_size = value;
-            // fill the gap between the top of the screen and the BBC image.
-            al_draw_filled_rectangle(0, 0, scr_x_size, scr_y_start, black);
-            // fill the gap between the BBC image and the bottom of the screen.
-            al_draw_filled_rectangle(0, scr_y_start + value, winsizex, winsizey, black);
-        }
-    } else {
-        log_error("vidalleg: could not set graphics mode to full-screen");
+    }
+    if (cur_adapter < 0) {
+        log_error("vidalleg: could not identify current monitor");
         fullscreen = 0;
+        return;
+    }
+
+    int cur_mon_width = aminfo.x2 - aminfo.x1;
+    int cur_mon_height = aminfo.y2 - aminfo.y1;
+
+    al_set_display_flag(display, ALLEGRO_FRAMELESS, true);
+    al_set_window_position(display, aminfo.x1, aminfo.y1);
+    al_resize_display(display, cur_mon_width, cur_mon_height);
+
+    black = al_map_rgb(0, 0, 0);
+    winsizex = al_get_display_width(display);
+    winsizey = al_get_display_height(display);
+    aspect = (double)winsizex / (double)winsizey;
+    if (aspect > (4.0 / 3.0)) {
+        value = 4 * winsizey / 3;
+        scr_x_start = (winsizex - value) / 2;
+        scr_y_start = 0;
+        scr_x_size = value;
+        scr_y_size = winsizey;
+        al_set_target_backbuffer(display);
+        // fill the gap between the left screen edge and the BBC image.
+        al_draw_filled_rectangle(0, 0, scr_x_start, scr_y_size, black);
+        // fill the gap between the BBC image and the right screen edge.
+        al_draw_filled_rectangle(scr_x_start + value, 0, winsizex, winsizey, black);
+    }
+    else {
+        value = 3 * winsizex / 4;
+        scr_x_start = 0;
+        scr_y_start = (winsizey - value) / 2;
+        scr_x_size = winsizex;
+        scr_y_size = value;
+        // fill the gap between the top of the screen and the BBC image.
+        al_draw_filled_rectangle(0, 0, scr_x_size, scr_y_start, black);
+        // fill the gap between the BBC image and the bottom of the screen.
+        al_draw_filled_rectangle(0, scr_y_start + value, winsizex, winsizey, black);
     }
 }
 
@@ -184,9 +200,11 @@ void video_leavefullscreen(void)
     display = al_get_current_display();
 
     //try and restore size to pre fullscreen size
+    al_set_display_flag(display, ALLEGRO_FRAMELESS, false);
+    al_set_window_position(display, save_winx, save_winy);
     al_resize_display(display, save_winsizex, save_winsizey);
 
-    al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, false);
+    //al_set_display_flag(display, ALLEGRO_FULLSCREEN_WINDOW, false);
     scr_x_start = 0;
     scr_x_size = winsizex = al_get_display_width(display);
     scr_y_start = 0;
