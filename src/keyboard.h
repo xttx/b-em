@@ -3,7 +3,7 @@
 
 extern int kbdips;
 
-#define KEY_ACTION_MAX 10
+#define KEY_ACTION_MAX 13
 
 struct key_act_const {
     const char *name;

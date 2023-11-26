@@ -688,6 +688,20 @@ static void quick_save_prev(void)
     main_quick_slot_prev();
 }
 
+static void insert_disk_1()
+{
+    disc_choose_hotkey(0);
+}
+
+static void insert_disk_2()
+{
+    disc_choose_hotkey(1);
+}
+static void insert_tape()
+{
+    tape_load_hotkey();
+}
+
 static void do_nothing(void) {}
 
 const struct key_act_const keyact_const[KEY_ACTION_MAX] = {
@@ -700,6 +714,9 @@ const struct key_act_const keyact_const[KEY_ACTION_MAX] = {
     { "quick-load",     ALLEGRO_KEY_F8,    false, quick_load,              do_nothing      },
     { "quick-save-prv", ALLEGRO_KEY_F6,    false, quick_save_prev,         do_nothing      },
     { "quick-save-nxt", ALLEGRO_KEY_F7,    false, quick_save_next,         do_nothing      },
+    { "insert-disk-1",  ALLEGRO_KEY_F1,    true,  insert_disk_1,           do_nothing      },
+    { "insert-disk-2",  ALLEGRO_KEY_F2,    true,  insert_disk_2,           do_nothing      },
+    { "insert-tape",    ALLEGRO_KEY_F3,    true,  insert_tape,             do_nothing      },
     { "full-screen2",   ALLEGRO_KEY_ENTER, true,  toggle_fullscreen_menu,  do_nothing      }
 };
 

@@ -892,21 +892,20 @@ static void disc_choose_new(ALLEGRO_EVENT *event, const char *ext)
         al_destroy_path(apath);
 }
 
-static void disc_choose(ALLEGRO_EVENT *event, const char *opname, const char *exts, int flags)
+static const char all_dext[] = "*.ssd;*.dsd;*.img;*.adf;*.ads;*.adm;*.adl;*.sdd;*.ddd;*.fdi;*.imd;*.hfe"
+"*.SSD;*.DSD;*.IMG;*.ADF;*.ADS;*.ADM;*.ADL;*.SDD;*.DDD;*.FDI;*.IMD;*.HFE";
+
+static void disc_choose_sub(int drive, ALLEGRO_DISPLAY* display, menu_id_t mode, const char *opname, const char *exts, int flags)
 {
     ALLEGRO_FILECHOOSER *chooser;
-    ALLEGRO_DISPLAY *display;
     ALLEGRO_PATH *apath;
-    int drive;
     const char *fpath;
     char title[70];
 
-    drive = menu_get_num(event);
     if (!(apath = discfns[drive]) || !(fpath = al_path_cstr(apath, ALLEGRO_NATIVE_PATH_SEP)))
         fpath = ".";
     snprintf(title, sizeof title, "Choose a disc to %s drive %d/%d", opname, drive, drive+2);
     if ((chooser = al_create_native_file_dialog(fpath, title, exts, flags))) {
-        display = (ALLEGRO_DISPLAY *)(event->user.data2);
         if (al_show_native_file_dialog(display, chooser)) {
             if (al_get_native_file_dialog_count(chooser) > 0) {
                 ALLEGRO_PATH *path = al_create_path(al_get_native_file_dialog_path(chooser, 0));
@@ -914,7 +913,7 @@ static void disc_choose(ALLEGRO_EVENT *event, const char *opname, const char *ex
                 if (discfns[drive])
                     al_destroy_path(discfns[drive]);
                 discfns[drive] = path;
-                switch(menu_get_id(event)) {
+                switch(mode) {
                     case IDM_DISC_AUTOBOOT:
                         main_reset();
                         autoboot = 150;
@@ -932,6 +931,18 @@ static void disc_choose(ALLEGRO_EVENT *event, const char *opname, const char *ex
         }
         al_destroy_native_file_dialog(chooser);
     }
+}
+void disc_choose_hotkey(int drive)
+{
+    ALLEGRO_DISPLAY* display = al_get_current_display();
+    disc_choose_sub(drive, display, IDM_DISC_LOAD, "autoboot in", all_dext, ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
+}
+static void disc_choose(ALLEGRO_EVENT* event, const char* opname, const char* exts, int flags)
+{
+    int drive = menu_get_num(event);
+    ALLEGRO_DISPLAY* display = (ALLEGRO_DISPLAY*)(event->user.data2);
+    menu_id_t mode = menu_get_id(event);
+    disc_choose_sub(drive, display, mode, opname, exts, flags);
 }
 
 static void disc_eject(ALLEGRO_EVENT *event)
@@ -1043,26 +1054,34 @@ static void disc_vdfs_root(ALLEGRO_EVENT *event)
     }
 }
 
-static void tape_load_ui(ALLEGRO_EVENT *event)
+static void tape_load_sub(ALLEGRO_DISPLAY* display)
 {
-    ALLEGRO_FILECHOOSER *chooser;
-    ALLEGRO_DISPLAY *display;
-    const char *fpath;
+    ALLEGRO_FILECHOOSER* chooser;
+    const char* fpath;
 
     if (!tape_fn || !(fpath = al_path_cstr(tape_fn, ALLEGRO_NATIVE_PATH_SEP)))
         fpath = ".";
     if ((chooser = al_create_native_file_dialog(fpath, "Choose a tape to load", "*.uef;*.csw", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST))) {
-        display = (ALLEGRO_DISPLAY *)(event->user.data2);
         if (al_show_native_file_dialog(display, chooser)) {
             if (al_get_native_file_dialog_count(chooser) > 0) {
                 tape_close();
-                ALLEGRO_PATH *path = al_create_path(al_get_native_file_dialog_path(chooser, 0));
+                ALLEGRO_PATH* path = al_create_path(al_get_native_file_dialog_path(chooser, 0));
                 tape_load(path);
                 tape_fn = path;
                 tape_loaded = 1;
             }
         }
     }
+}
+static void tape_load_ui(ALLEGRO_EVENT *event)
+{
+    ALLEGRO_DISPLAY* display = (ALLEGRO_DISPLAY*)(event->user.data2);
+    tape_load_sub(display);
+}
+void tape_load_hotkey()
+{
+    ALLEGRO_DISPLAY* display = al_get_current_display();
+    tape_load_sub(display);
 }
 
 static void tape_rewind(void)
@@ -1210,9 +1229,6 @@ static void change_mode7_font(ALLEGRO_EVENT *event)
     if (mode7_loadchars(mode7_font_files[newix]))
         mode7_font_index = newix;
 }
-
-static const char all_dext[] = "*.ssd;*.dsd;*.img;*.adf;*.ads;*.adm;*.adl;*.sdd;*.ddd;*.fdi;*.imd;*.hfe"
-                               "*.SSD;*.DSD;*.IMG;*.ADF;*.ADS;*.ADM;*.ADL;*.SDD;*.DDD;*.FDI;*.IMD;*.HFE";
 
 void gui_allegro_event(ALLEGRO_EVENT *event)
 {
