@@ -34,6 +34,10 @@ void main_stop_fullspeed(bool hostshift);
 
 void main_key_break(void);
 void main_key_pause(void);
+void main_quick_save(void);
+void main_quick_load(void);
+void main_quick_slot_prev(void);
+void main_quick_slot_next(void);
 
 void main_cleardrawit(void);
 void main_setmouse(void);

@@ -436,6 +436,59 @@ void main_key_pause(void)
     }
 }
 
+int save_slot = 0;
+void main_quick_save(void)
+{
+    char* prefix = "QuickSave_";
+    char suffix[2];
+    suffix[0] = save_slot + '0';
+    suffix[1] = '\0';
+    const char* filename = malloc(strlen(prefix) + 2);
+    strcpy(filename, prefix);
+    strcat(filename, suffix);
+
+    ALLEGRO_PATH* path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+    al_append_path_component(path, "states");
+    const char* cpath = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
+    CreateDirectory(cpath, NULL);
+    //al_set_path_filename(path, "QuickSave1");
+    al_set_path_filename(path, filename);
+    cpath = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
+    savestate_save(cpath);
+}
+void main_quick_load(void)
+{
+    char* prefix = "QuickSave_";
+    char* ext = ".snp";
+    char suffix[2];
+    suffix[0] = save_slot + '0';
+    suffix[1] = '\0';
+    const char* filename = malloc(strlen(prefix) + 6);
+    strcpy(filename, prefix);
+    strcat(filename, suffix);
+    strcat(filename, ext);
+
+    ALLEGRO_PATH* path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+    al_append_path_component(path, "states");
+    //al_set_path_filename(path, "QuickSave1.snp");
+    al_set_path_filename(path, filename);
+    const char* cpath = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
+    DWORD dwAttrib = GetFileAttributes(cpath);
+    if (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY)) {
+        savestate_load(cpath);
+    }
+}
+void main_quick_slot_prev(void)
+{
+    save_slot--;
+    if (save_slot < 0) save_slot = 0;
+}
+void main_quick_slot_next(void)
+{
+    save_slot++;
+    if (save_slot > 35) save_slot = 35;
+}
+
 double prev_time = 0;
 int execs = 0;
 double spd = 0;

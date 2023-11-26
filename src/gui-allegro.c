@@ -122,6 +122,8 @@ static ALLEGRO_MENU *create_file_menu(void)
     al_append_menu_item(menu, "Hard Reset", IDM_FILE_RESET, 0, NULL, NULL);
     al_append_menu_item(menu, "Load state...", IDM_FILE_LOAD_STATE, 0, NULL, NULL);
     al_append_menu_item(menu, "Save State...", IDM_FILE_SAVE_STATE, 0, NULL, NULL);
+    al_append_menu_item(menu, "Quick Load", IDM_QUICKLOAD, 0, NULL, NULL);
+    al_append_menu_item(menu, "Quick Save", IDM_QUICKSAVE, 0, NULL, NULL);
     al_append_menu_item(menu, "Save Screenshot...", IDM_FILE_SCREEN_SHOT, 0, NULL, NULL);
     add_checkbox_item(menu, "Print to file", IDM_FILE_PRINT, print_dest == PDEST_FILE);
     add_checkbox_item(menu, "Print to command", IDM_FILE_PCMD, print_dest == PDEST_PIPE);
@@ -1227,6 +1229,12 @@ void gui_allegro_event(ALLEGRO_EVENT *event)
             break;
         case IDM_FILE_SAVE_STATE:
             file_save_state(event);
+            break;
+        case IDM_QUICKLOAD:
+            main_quick_load();
+            break;
+        case IDM_QUICKSAVE:
+            main_quick_save();
             break;
         case IDM_FILE_SCREEN_SHOT:
             file_save_scrshot(event);

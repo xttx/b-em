@@ -104,7 +104,9 @@ typedef enum {
     IDM_SPEED,
     IDM_DEBUGGER,
     IDM_DEBUG_TUBE,
-    IDM_DEBUG_BREAK
+    IDM_DEBUG_BREAK,
+    IDM_QUICKSAVE,
+    IDM_QUICKLOAD
 } menu_id_t;
 
 extern void gui_allegro_init(ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_DISPLAY *display);
