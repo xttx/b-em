@@ -147,10 +147,12 @@ static const char helptext[] =
     "-exec file      - debugger to execute file\n"
     "-paste string   - paste string in as if typed\n"
     "-vroot host-dir - set the VDFS root\n"
-    "-vdir guest-dir - set the initial (boot) dir in VDFS\n\n";
+    "-vdir guest-dir - set the initial (boot) dir in VDFS\n"
+    "-fullscreen     - start fullscreen\n\n";
 
 void main_init(int argc, char *argv[])
 {
+    bool start_fullscreen = false;
     int tapenext = 0, discnext = 0, execnext = 0, vdfsnext = 0, pastenext = 0;
     ALLEGRO_DISPLAY *display;
     ALLEGRO_PATH *path;
@@ -210,6 +212,8 @@ void main_init(int argc, char *argv[])
             fasttape = true;
         else if (!strcasecmp(argv[c], "-autoboot"))
             autoboot = 150;
+        else if (!strcasecmp(argv[c], "-fullscreen"))
+            start_fullscreen = true;
         else if (argv[c][0] == '-' && (argv[c][1] == 'f' || argv[c][1]=='F')) {
             sscanf(&argv[c][2], "%i", &vid_fskipmax);
             if (vid_fskipmax < 1) vid_fskipmax = 1;
@@ -278,6 +282,11 @@ void main_init(int argc, char *argv[])
     }
 
     display = video_init();
+    if (start_fullscreen) {
+        fullscreen = 1;
+        video_enterfullscreen();
+    }
+
     mode7_makechars();
     al_init_image_addon();
     led_init();
@@ -330,7 +339,9 @@ void main_init(int argc, char *argv[])
 
     tmp_display = display;
 
-    gui_allegro_init(queue, display);
+    if (!start_fullscreen) {
+        gui_allegro_init(queue, display);
+    }
 
     time_limit = 2.0 / 50.0;
     if (!(timer = al_create_timer(1.0 / 50.0))) {
