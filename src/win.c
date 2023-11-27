@@ -26,6 +26,12 @@ static bool win_file_exists(ALLEGRO_PATH *path, const char *name, const char *ex
     }
 }
 
+bool check_portable_txt() {
+    ALLEGRO_PATH* path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+    bool exist = win_file_exists(path, "portable", ".txt");
+    return exist;
+}
+
 ALLEGRO_PATH *find_dat_file(ALLEGRO_PATH *dir, const char *name, const char *ext) {
     ALLEGRO_PATH *path;
 
@@ -41,11 +47,14 @@ ALLEGRO_PATH *find_dat_file(ALLEGRO_PATH *dir, const char *name, const char *ext
 ALLEGRO_PATH *find_cfg_file(const char *name, const char *ext) {
     ALLEGRO_PATH *path;
 
-    if ((path = al_get_standard_path(ALLEGRO_USER_SETTINGS_PATH))) {
-        if (win_file_exists(path, name, ext))
-            return path;
-        al_destroy_path(path);
+    if (!portable_mode) {
+        if ((path = al_get_standard_path(ALLEGRO_USER_SETTINGS_PATH))) {
+            if (win_file_exists(path, name, ext))
+                return path;
+            al_destroy_path(path);
+        }
     }
+
     if ((path = al_get_standard_path(ALLEGRO_RESOURCES_PATH))) {
         if (win_file_exists(path, name, ext))
             return path;
@@ -58,7 +67,13 @@ ALLEGRO_PATH *find_cfg_dest(const char *name, const char *ext) {
     ALLEGRO_PATH *path;
     const char *cpath;
 
-    if ((path = al_get_standard_path(ALLEGRO_USER_SETTINGS_PATH))) {
+    if (portable_mode) {
+        path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+    } else {
+        path = al_get_standard_path(ALLEGRO_USER_SETTINGS_PATH);
+    }
+
+    if (path) {
         cpath = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
         CreateDirectory(cpath, NULL);
         al_set_path_filename(path, name);

@@ -71,6 +71,7 @@
 bool quitting = false;
 bool keydefining = false;
 bool autopause = false;
+bool portable_mode = false;
 int autoboot=0;
 int joybutton[2];
 float joyaxes[4];
@@ -159,6 +160,16 @@ void main_init(int argc, char *argv[])
     if (!al_init()) {
         fputs("Failed to initialise Allegro!\n", stderr);
         exit(1);
+    }
+
+    if (check_portable_txt()) {
+        portable_mode = true;
+    }
+    else {
+        //We really need to do it here, before config loading
+        for (int c = 1; c < argc; c++) {
+            if (!strcasecmp(argv[c], "-portable")) { portable_mode = true; break; }
+        }
     }
 
     al_init_native_dialog_addon();
