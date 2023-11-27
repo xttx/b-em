@@ -60,7 +60,7 @@ void compactcmos_load(const MODEL *m)
         al_destroy_path(path);
     }
     else
-        log_error("compactcmos: unable to find CMOS file %s", cmos_file);
+        log_warn("compactcmos: unable to find CMOS file %s", cmos_file);
 }
 
 void compactcmos_save(const MODEL *m)
