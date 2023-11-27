@@ -190,12 +190,12 @@ void main_init(int argc, char *argv[])
 
     for (int c = 1; c < argc; c++) {
         if (!strcasecmp(argv[c], "--help") || !strcmp(argv[c], "-?") || !strcasecmp(argv[c], "-h")) {
-            fwrite(helptext, sizeof helptext-1, 1, stdout);
+            fwrite(helptext, sizeof helptext - 1, 1, stdout);
             exit(1);
         }
         else if (!strncasecmp(argv[c], "-sp", 3)) {
             sscanf(&argv[c][3], "%i", &emuspeed);
-            if(!(emuspeed < NUM_EMU_SPEEDS))
+            if (!(emuspeed < NUM_EMU_SPEEDS))
                 emuspeed = 4;
         }
         else if (!strcasecmp(argv[c], "-tape"))
@@ -214,7 +214,7 @@ void main_init(int argc, char *argv[])
             autoboot = 150;
         else if (!strcasecmp(argv[c], "-fullscreen"))
             start_fullscreen = true;
-        else if (argv[c][0] == '-' && (argv[c][1] == 'f' || argv[c][1]=='F')) {
+        else if (argv[c][0] == '-' && (argv[c][1] == 'f' || argv[c][1] == 'F')) {
             sscanf(&argv[c][2], "%i", &vid_fskipmax);
             if (vid_fskipmax < 1) vid_fskipmax = 1;
             if (vid_fskipmax > 9) vid_fskipmax = 9;
@@ -241,9 +241,9 @@ void main_init(int argc, char *argv[])
             tape_fn = al_create_path(argv[c]);
         }
         else if (discnext) {
-            if (discfns[discnext-1])
-                al_destroy_path(discfns[discnext-1]);
-            discfns[discnext-1] = al_create_path(argv[c]);
+            if (discfns[discnext - 1])
+                al_destroy_path(discfns[discnext - 1]);
+            discfns[discnext - 1] = al_create_path(argv[c]);
             discnext = 0;
         }
         else if (execnext) {
@@ -257,8 +257,12 @@ void main_init(int argc, char *argv[])
                 vroot = argv[c];
             vdfsnext = 0;
         }
-        else if (pastenext)
+        else if (pastenext) {
+            argv[c] = strreplace(argv[c], "\\r\\n", "\n");
+            argv[c] = strreplace(argv[c], "\\n", "\n");
+            argv[c] = strreplace(argv[c], "\\r", "\n");
             os_paste_start(strdup(argv[c]));
+        }
         else {
             path = al_create_path(argv[c]);
             ext = al_get_path_extension(path);
@@ -792,4 +796,16 @@ int main(int argc, char **argv)
     main_run();
     main_close();
     return 0;
+}
+
+char* strreplace(char* s, const char* s1, const char* s2) {
+    char* p = strstr(s, s1);
+    if (p != NULL) {
+        size_t len1 = strlen(s1);
+        size_t len2 = strlen(s2);
+        if (len1 != len2)
+            memmove(p + len2, p + len1, strlen(p + len1) + 1);
+        memcpy(p, s2, len2);
+    }
+    return s;
 }

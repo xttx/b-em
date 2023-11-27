@@ -45,4 +45,6 @@ void main_quick_slot_next(void);
 void main_cleardrawit(void);
 void main_setmouse(void);
 
+char* strreplace(char* s, const char* s1, const char* s2);
+
 #endif
