@@ -236,9 +236,9 @@ static const key_cap_t kcaps_master[MASTER_NKEY] = {
     { 316, 248,  96,  28, COL_GREEN, "Prev Slot",   "Prev Slot",   0xf8 },
     { 416, 248,  96,  28, COL_GREEN, "Next Slot",   "Next Slot",   0xf7 },
 
-    {  70, 278,  96,  28, COL_GREEN, "Load Disc 0",  "Load Disc 0", 0xf6 },
-    { 170, 278,  96,  28, COL_GREEN, "Load Disc 1",  "Load Disc 1", 0xf5 },
-    { 270, 278,  96,  28, COL_GREEN, "Load Tape",    "Load Tape",   0xf4 }
+    { 116, 278,  96,  28, COL_GREEN, "Load Disc 0",  "Load Disc 0", 0xf6 },
+    { 216, 278,  96,  28, COL_GREEN, "Load Disc 1",  "Load Disc 1", 0xf5 },
+    { 316, 278,  96,  28, COL_GREEN, "Load Tape",    "Load Tape",   0xf4 }
 };
 
 static const key_dlg_t master_kbd_dlg = { kcaps_master, kcaps_master + MASTER_NKEY, 676, 364 };
