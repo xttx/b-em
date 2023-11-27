@@ -342,10 +342,7 @@ void main_init(int argc, char *argv[])
     joystick_init(queue);
 
     tmp_display = display;
-
-    if (!start_fullscreen) {
-        gui_allegro_init(queue, display);
-    }
+    gui_allegro_init(queue, display);
 
     time_limit = 2.0 / 50.0;
     if (!(timer = al_create_timer(1.0 / 50.0))) {
@@ -379,6 +376,10 @@ void main_init(int argc, char *argv[])
         gui_set_disc_wprot(1, writeprot[1]);
     main_setspeed(emuspeed);
     debug_start(exec_fn);
+
+    if (start_fullscreen) {
+        gui_allegro_destroy(queue, tmp_display);
+    }
 }
 
 void main_restart()
