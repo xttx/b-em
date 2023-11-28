@@ -477,13 +477,15 @@ void main_quick_save(void)
     else if (discfns[1] != NULL) {
         prefix = al_get_path_basename(discfns[1], ALLEGRO_NATIVE_PATH_SEP);
     }
+    char* ext = ".snp";
     char suffix[3];
     suffix[0] = '_';
     suffix[1] = save_slot + '0';
     suffix[2] = '\0';
-    const char* filename = malloc(strlen(prefix) + 3);
+    const char* filename = malloc(strlen(prefix) + 6);
     strcpy(filename, prefix);
     strcat(filename, suffix);
+    strcat(filename, ext);
 
     ALLEGRO_PATH* path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
     al_append_path_component(path, "states");
@@ -496,10 +498,9 @@ void main_quick_save(void)
     //hud
     if (quick_save_hud != NULL) free(quick_save_hud);
     prefix = "Saved State: ";
-    quick_save_hud = malloc(strlen(prefix) + strlen(filename) + 5);
+    quick_save_hud = malloc(strlen(prefix) + strlen(filename) + 1);
     strcpy(quick_save_hud, prefix);
     strcat(quick_save_hud, filename);
-    strcat(quick_save_hud, ".snp");
     quick_save_hud_alpha = 255;
 
     //free(filename);
